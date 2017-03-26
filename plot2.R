@@ -38,22 +38,12 @@ fpath <- file.path("./data", fname)
 NEI <- readRDS(fpath[2]) # 6497651 x 6
 
 # if file already downloaded and unzipped
-NEI <- readRDS("./data/summarySCC_PM25.rds") # 6497651 x 6
-
+# NEI <- readRDS("./data/summarySCC_PM25.rds") # 6497651 x 6
 
 baltimore <- NEI[NEI$fips == "24510",]
 
-balt1999 <-  NEI[NEI$fips=="24510" & NEI$year=="1999", "Emissions"]
-balt2002 <-  NEI[NEI$fips=="24510" & NEI$year=="2002", "Emissions"]
-balt2005 <-  NEI[NEI$fips=="24510" & NEI$year=="2005", "Emissions"]
-balt2008 <-  NEI[NEI$fips=="24510" & NEI$year=="2008", "Emissions"]
-
-dat <- list(balt1999, balt2002, balt2005, balt2008)
-
-summarydat <- lapply(dat, summary)
-
-
-# Total emissions of PM2.5 for Baltimore have generally decreased
+yEmiss <- baltimore[, c("year", "Emissions")]
+total <- aggregate(Emissions ~ year, yEmiss, sum)
 
 
 ###############################################################
@@ -62,10 +52,10 @@ summarydat <- lapply(dat, summary)
 
 png(filename = "plot2.png",width = 480, height = 480)
 
-boxplot( log10(balt1999), log10(balt2002), log10(balt2005), 
-         log10(balt2008), ylab="Emissions (log10)",
-         names=c("1999","2002","2005","2008")  )
-title(main="Emissions in Baltimore City")
+barplot(total$Emissions,names.arg = total$year, ylim=c(0,3500),
+        ylab = "Total Emissions", 
+        xlab = 'Year', 
+        main = "Baltimore City Total PM2.5 Emission")
 
 dev.off()
 
